@@ -88,12 +88,12 @@ class PlainTextParser
 
     fields << ["%FILENAME%", pkg.filename].join("\n")
     fields << ["%NAME%", pkg.name].join("\n")
-    if pkg.base
+    if pkg.base and not pkg.base.empty?
       fields << ["%BASE%", pkg.base].join("\n")
     end
     fields << ["%VERSION%", pkg.version].join("\n")
     fields << ["%DESC%", pkg.description].join("\n")
-    if pkg.groups
+    if pkg.groups and not pkg.groups.empty?
       fields << ["%GROUPS%", *pkg.groups].join("\n")
     end
     fields << ["%CSIZE%", pkg.download_size.to_s].join("\n")
@@ -105,34 +105,34 @@ class PlainTextParser
     unless @skip_pgp
       fields << ["%PGPSIG%", pkg.pgpsig].join("\n")
     end
-    if pkg.url
+    if pkg.url and not pkg.url.empty?
       fields << ["%URL%", pkg.url].join("\n")
     end
-    if pkg.license
+    if pkg.license and not pkg.license.empty?
       fields << ["%LICENSE%", *pkg.license].join("\n")
     end
     fields << ["%ARCH%", pkg.arch].join("\n")
     fields << ["%BUILDDATE%", pkg.builddate.to_s].join("\n")
     fields << ["%PACKAGER%", pkg.packager].join("\n")
-    if pkg.replaces
+    if pkg.replaces and not pkg.replaces.empty?
       fields << ["%REPLACES%", *pkg.replaces].join("\n")
     end
-    if pkg.conflicts
+    if pkg.conflicts and not pkg.conflicts.empty?
       fields << ["%CONFLICTS%", *pkg.conflicts].join("\n")
     end
-    if pkg.provides
+    if pkg.provides and not pkg.provides.empty?
       fields << ["%PROVIDES%", *pkg.provides].join("\n")
     end
-    if pkg.depends
+    if pkg.depends and not pkg.depends.empty?
       fields << ["%DEPENDS%", *pkg.depends].join("\n")
     end
-    if pkg.optdepends
+    if pkg.optdepends and not pkg.optdepends.empty?
       fields << ["%OPTDEPENDS%", *pkg.optdepends].join("\n")
     end
-    if pkg.makedepends
+    if pkg.makedepends and not pkg.makedepends.empty?
       fields << ["%MAKEDEPENDS%", *pkg.makedepends].join("\n")
     end
-    if pkg.checkdepends
+    if pkg.checkdepends and not pkg.checkdepends.empty?
       fields << ["%CHECKDEPENDS%", *pkg.checkdepends].join("\n")
     end
 

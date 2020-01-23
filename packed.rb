@@ -7,10 +7,6 @@ class PackedParser
     @skip_pgp = options[:skip_pgp]
   end
 
-  def parse(str)
-    raise NotImplementedError
-  end
-
   def dump_string(io, str)
     unless str.nil?
       raise unless str.instance_of? String
@@ -55,7 +51,6 @@ class PackedParser
     end
   end
 
-  # return string
   def dump(io, pkg)
     dump_string(io, pkg.filename)
     dump_string(io, pkg.name)
@@ -63,8 +58,8 @@ class PackedParser
     dump_string(io, pkg.version)
     dump_string(io, pkg.description)
     dump_array_str(io, pkg.groups)
-    dump_u32(io, pkg.download_size)
-    dump_u32(io, pkg.install_size)
+    dump_u64(io, pkg.download_size)
+    dump_u64(io, pkg.install_size)
     dump_binary(io, pkg.md5sum, 16) unless @skip_md5
     dump_binary(io, pkg.sha256sum, 32)
     dump_string(io, pkg.pgpsig) unless @skip_pgp
@@ -81,6 +76,65 @@ class PackedParser
     dump_array_str(io, pkg.makedepends)
     dump_array_str(io, pkg.checkdepends)
   end
+
+  def parse_binary(io, len)
+    io.read(len)
+  end
+
+  def parse_string(io)
+    io.readline("\0")[0..-2]
+  end
+
+  def parse_array_str(io)
+    len = parse_u8(io)
+    arr = []
+    len.times do
+      arr << parse_string(io)
+    end
+    arr
+  end
+
+  def parse_u8(io)
+    io.read(1).unpack("C")[0]
+  end
+
+  def parse_u32(io)
+    io.read(4).unpack("L")[0]
+  end
+
+  def parse_u64(io)
+    io.read(8).unpack("Q")[0]
+  end
+
+  def parse(io)
+    pkg = Package.new
+
+    pkg.filename = parse_string(io)
+    pkg.name = parse_string(io)
+    pkg.base = parse_string(io)
+    pkg.version = parse_string(io)
+    pkg.description = parse_string(io)
+    pkg.groups = parse_array_str(io)
+    pkg.download_size = parse_u64(io)
+    pkg.install_size = parse_u64(io)
+    pkg.md5sum = parse_binary(io, 16) unless @skip_md5
+    pkg.sha256sum = parse_binary(io, 32)
+    pkg.pgpsig = parse_string(io) unless @skip_pgp
+    pkg.url = parse_string(io)
+    pkg.license = parse_array_str(io)
+    pkg.arch = parse_string(io)
+    pkg.builddate = parse_u64(io)
+    pkg.packager = parse_string(io)
+    pkg.replaces = parse_array_str(io)
+    pkg.conflicts = parse_array_str(io)
+    pkg.provides = parse_array_str(io)
+    pkg.depends = parse_array_str(io)
+    pkg.optdepends = parse_array_str(io)
+    pkg.makedepends = parse_array_str(io)
+    pkg.checkdepends = parse_array_str(io)
+
+    pkg
+  end
 end
 
 class PackedStorage
@@ -92,7 +146,7 @@ class PackedStorage
   # Returns object of type Database
   def load
     db = Database.new
-    file = File.new(filename)
+    file = File.new(@filename)
 
     while not file.eof?
       db.packages << @parser.parse(file)
