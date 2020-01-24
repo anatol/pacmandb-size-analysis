@@ -1,10 +1,10 @@
-require "minitar"
 require "./package"
 
 class PackedParser
   def initialize(**options)
     @skip_md5 = options[:skip_md5]
     @skip_pgp = options[:skip_pgp]
+    @var_int = options[:var_int] # variable length integer encoding
   end
 
   def dump_string(io, str)
@@ -26,19 +26,42 @@ class PackedParser
     io.write(data)
   end
 
+  def dump_varint(io, i)
+    # Variable length integer encoding, similar to one used by ProtoBuffer
+    loop do
+      rem = i % 0x80
+      i = i / 0x80
+      rem |= 0x80 if i > 0 # set MSB bit to 1 if more symbols are coming
+      io.putc(rem)
+      break if i == 0
+    end
+  end
+
   def dump_u8(io, int)
-    bin = [int].pack("C") # 8-bit unsigned
-    dump_binary(io, bin, 1)
+    if @var_int
+      dump_varint(io, int)
+    else
+      bin = [int].pack("C") # 8-bit unsigned
+      dump_binary(io, bin, 1)
+    end
   end
 
   def dump_u32(io, int)
-    bin = [int].pack("L") # 32-bit unsigned, native (!!) endian
-    dump_binary(io, bin, 4)
+    if @var_int
+      dump_varint(io, int)
+    else
+      bin = [int].pack("L") # 32-bit unsigned, native (!!) endian
+      dump_binary(io, bin, 4)
+    end
   end
 
   def dump_u64(io, int)
-    bin = [int].pack("Q") # 64-bit unsigned, native (!!) endian
-    dump_binary(io, bin, 8)
+    if @var_int
+      dump_varint(io, int)
+    else
+      bin = [int].pack("Q") # 64-bit unsigned, native (!!) endian
+      dump_binary(io, bin, 8)
+    end
   end
 
   # array can have up to 255 elements
@@ -94,16 +117,48 @@ class PackedParser
     arr
   end
 
+  def parse_varint(io)
+    i = 0
+    offset = 0
+    lastbyte = false
+    loop do
+      c = io.getbyte
+      if c >= 0x80
+        c &= 0x7f # remove the MSB that indicates that more symbols are coming
+      else
+        lastbyte = true
+      end
+
+      c <<= offset
+      i += c
+      return i if lastbyte
+
+      offset += 7
+    end
+  end
+
   def parse_u8(io)
-    io.read(1).unpack("C")[0]
+    if @var_int
+      parse_varint(io)
+    else
+      io.read(1).unpack("C")[0]
+    end
   end
 
   def parse_u32(io)
-    io.read(4).unpack("L")[0]
+    if @var_int
+      parse_varint(io)
+    else
+      io.read(4).unpack("L")[0]
+    end
   end
 
   def parse_u64(io)
-    io.read(8).unpack("Q")[0]
+    if @var_int
+      parse_varint(io)
+    else
+      io.read(8).unpack("Q")[0]
+    end
   end
 
   def parse(io)

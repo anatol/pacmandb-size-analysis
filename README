@@ -1,25 +1,28 @@
 Use copy of /var/lib/pacman/sync/community.db as a sample for experiments
 Experiment 'plain':
-  uncompressed size is 17771008 that is equal to original sample
-  'zstd -19' compressed size is 4374430 that is 1.008342115429896 times better than original sample
+  uncompressed size is 17774592 that is equal to original sample
+  'zstd -19' compressed size is 4372365 that is 1.0087099315816497 times better than original sample
 Experiment 'plain_nomd5':
-  uncompressed size is 17551872 that is 1.012485050027712 times better than original sample
-  'zstd -19' compressed size is 4191043 that is 1.0524640286439437 times better than original sample
+  uncompressed size is 17555456 that is 1.012482501166589 times better than original sample
+  'zstd -19' compressed size is 4189237 that is 1.0528046037977798 times better than original sample
 Experiment 'plain_nopgp':
-  uncompressed size is 14099456 that is 1.2604038056503741 times better than original sample
-  'zstd -19' compressed size is 1161104 that is 3.798903457399165 times better than original sample
+  uncompressed size is 14101504 that is 1.2604749110449496 times better than original sample
+  'zstd -19' compressed size is 1161428 that is 3.7974355706940077 times better than original sample
 Experiment 'plain_nomd5pgp':
-  uncompressed size is 13258240 that is 1.3403745896891293 times better than original sample
-  'zstd -19' compressed size is 1021859 that is 4.3165661798741315 times better than original sample
+  uncompressed size is 13260288 that is 1.3404378547434264 times better than original sample
+  'zstd -19' compressed size is 1023167 that is 4.310584684611603 times better than original sample
 Experiment 'packed':
-  uncompressed size is 7215201 that is 2.4629955561875545 times better than original sample
-  'zstd -19' compressed size is 4142262 that is 1.0648582827450315 times better than original sample
+  uncompressed size is 7216982 that is 2.462884346947242 times better than original sample
+  'zstd -19' compressed size is 4143769 that is 1.0643566279877088 times better than original sample
 Experiment 'packed_nomd5':
-  uncompressed size is 7098625 that is 2.503443695081794 times better than original sample
-  'zstd -19' compressed size is 3993972 that is 1.1043948229982583 times better than original sample
+  uncompressed size is 7100390 that is 2.5033261553238626 times better than original sample
+  'zstd -19' compressed size is 3994581 that is 1.1041077900285412 times better than original sample
 Experiment 'packed_nopgp':
-  uncompressed size is 2847111 that is 6.241768585769926 times better than original sample
-  'zstd -19' compressed size is 884999 that is 4.9840982871167085 times better than original sample
+  uncompressed size is 2847455 that is 6.2422731878115725 times better than original sample
+  'zstd -19' compressed size is 885160 that is 4.98265624293913 times better than original sample
 Experiment 'packed_nomd5pgp':
-  uncompressed size is 2730535 that is 6.508251313387303 times better than original sample
-  'zstd -19' compressed size is 765900 that is 5.759135657396527 times better than original sample
+  uncompressed size is 2730863 that is 6.50878202238633 times better than original sample
+  'zstd -19' compressed size is 765800 that is 5.759268738574041 times better than original sample
+Experiment 'packed_varint_nomd5pgp':
+  uncompressed size is 2637977 that is 6.737963219542854 times better than original sample
+  'zstd -19' compressed size is 754885 that is 5.842542903886022 times better than original sample
