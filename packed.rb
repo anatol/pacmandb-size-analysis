@@ -70,7 +70,7 @@ class PackedParser
       dump_u8(io, 0)
     else
       dump_u8(io, arr.size)
-      arr.each { |s| dump_string(io, s) }
+      arr.each { dump_string(io, _1) }
     end
   end
 
@@ -110,11 +110,7 @@ class PackedParser
 
   def parse_array_str(io)
     len = parse_u8(io)
-    arr = []
-    len.times do
-      arr << parse_string(io)
-    end
-    arr
+    len.times.map { parse_string(io) }
   end
 
   def parse_varint(io)
@@ -201,21 +197,19 @@ class PackedStorage
   # Returns object of type Database
   def load
     db = Database.new
-    file = File.new(@filename)
-
-    while not file.eof?
-      db.packages << @parser.parse(file)
+    File.open(@filename) do |file|
+      while not file.eof?
+        db.packages << @parser.parse(file)
+      end
     end
-
-    file.close
     db
   end
 
   def store(db)
-    w = File.new(@filename, "wb")
-    db.packages.each do |pkg|
-      @parser.dump(w, pkg)
+    File.open(@filename, "wb") do |w|
+      db.packages.each do
+        @parser.dump(w, _1)
+      end
     end
-    w.close
   end
 end

@@ -14,10 +14,10 @@ File.open(TESTFILE, "w") do |io|
 end
 
 File.open(TESTFILE) do |io|
-  samples.each_with_index {
+  samples.each_with_index do
     i = parser.parse_varint(io)
     raise "#{_2}-th sample differs: #{_1} vs #{i}" if _1 != i
-  }
+  end
 
   raise "Expected to reach EOF" unless io.eof?
 end
